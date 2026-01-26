@@ -5,7 +5,7 @@ A simple mobile tool for LCD display custom characters creating, for Arduino.
 * **LiquidCrystal**
 * **LiquidCrystalI2C**
 
-## Gallery (light and dark themes)
+## Gallery (vertical, light and dark themes)
 <table>
     <tr>
         <td>
@@ -23,10 +23,25 @@ A simple mobile tool for LCD display custom characters creating, for Arduino.
     </tr>
 </table>
 
+## Gallery (horizontal, light and dark themes)
+<table>
+    <tr>
+        <td>
+            <img src="previews/lcd_horizontal1.jpg">
+        </td>
+        <td>
+            <img src="previews/lcd_horizontal2.jpg">
+        </td>
+    </tr>
+</table>
+
 ## Features:
 * dynamic result preview
 * source code generation
 * convenient UI 
+
+## Android versions
+Android 8.0 and later 
 
 ## How to use?
 To start creating custom character for your LCD display, use input panel with checkboxes. By checking a checkbox, you enable one pixel at a specific position, multiple such checked checkboxes determine the pixels used in your character. You can check the result by looking at a special preview stylized for the display. You can then view the characters's code(and copy to buffer) and use it when working in **Arduino** libraries for LCD: **LiquidCrystal**, **LiquidCrystalI2C**.
