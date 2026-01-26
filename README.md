@@ -1,5 +1,5 @@
 # LCD custom characters creator
-A simple mobile tool for LCD display custom characters creating, for Arduino.
+A simple mobile tool on *Jetpack Compose* for LCD display custom characters creating, for Arduino.
 
 ## Suitable for arduino libs:
 * **LiquidCrystal**
@@ -60,10 +60,10 @@ There is additional functionality to make work easier. For example, if you want 
     </tr>
     <tr>
         <td>
-            <h1>1</h1>
+            <h1>1 green lcd</h1>
         </td>
         <td>
-            <h1>2</h1>
+            <h1>2 invert</h1>
         </td>
     </tr>
 </table>
