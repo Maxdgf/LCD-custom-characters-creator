@@ -69,4 +69,4 @@ There is additional functionality to make work easier. For example, if you want 
 </table>
 
 ## License
-This project is licensed under the [MIT License](LICENSE.md)
+This project is licensed under the [MIT License](LICENSE)
