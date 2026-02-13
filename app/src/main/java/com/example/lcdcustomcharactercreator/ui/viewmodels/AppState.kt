@@ -14,7 +14,7 @@ class AppState : ViewModel() {
         const val MAP_SIZE = 40
     }
 
-    private var isPixelsMapInvertedState = false
+    private var isPixelsMapInvertedState = false // inverted pixels state
 
     /*
     * Pixels map as java BitSet.

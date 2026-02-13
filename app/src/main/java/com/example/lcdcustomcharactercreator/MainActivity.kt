@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -100,7 +101,9 @@ fun MainScreen(appState: AppState = viewModel()) {
         // pattern source code dialog
         ActionUiDialog(
             state = appState.sourceCodeDialogState,
-            onDismissRequestFunction = { appState.updateSourceCodeDialogState(false) }
+            onDismissRequestFunction = { appState.updateSourceCodeDialogState(false) },
+            titleIcon = painterResource(R.drawable.baseline_code_24),
+            titleText = "Source code of pattern"
         ) {
             Column(
                 modifier = Modifier
@@ -124,9 +127,10 @@ fun MainScreen(appState: AppState = viewModel()) {
                 }
 
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    SquaredUiButton(onClick = { clipBoardManager.setTextToClipboard(sourceCode.text) }) {
-                        Text(text = "copy code")
-                    }
+                    SquaredUiButton(
+                        onClick = { clipBoardManager.setTextToClipboard(sourceCode.text) },
+                        icon = painterResource(R.drawable.baseline_content_copy_24)
+                    ) { Text(text = "copy code") }
 
                     Spacer(modifier = Modifier.weight(1f))
 
@@ -151,7 +155,10 @@ fun MainScreen(appState: AppState = viewModel()) {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            SquaredUiButton(onClick = { appState.updateIsBlueDisplayState(true) }) {
+                            SquaredUiButton(
+                                onClick = { appState.updateIsBlueDisplayState(true) },
+                                modifier = Modifier.width(135.dp)
+                            ) {
                                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                                     Box(
                                         modifier = Modifier
@@ -159,12 +166,17 @@ fun MainScreen(appState: AppState = viewModel()) {
                                             .background(color = blueLcdColor)
                                             .align(Alignment.CenterVertically)
                                     )
-
-                                    Text(text = "blue LCD")
+                                    Text(
+                                        text = "blue LCD",
+                                        modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
+                                    )
                                 }
                             }
 
-                            SquaredUiButton(onClick = { appState.updateIsBlueDisplayState(false) }) {
+                            SquaredUiButton(
+                                onClick = { appState.updateIsBlueDisplayState(false) },
+                                modifier = Modifier.width(135.dp)
+                            ) {
                                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                                     Box(
                                         modifier = Modifier
@@ -172,18 +184,29 @@ fun MainScreen(appState: AppState = viewModel()) {
                                             .background(color = greenLcdColor)
                                             .align(Alignment.CenterVertically)
                                     )
-
-                                    Text(text = "green LCD")
+                                    Text(
+                                        text = "green LCD",
+                                        modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
+                                    )
                                 }
                             }
 
-                            SquaredUiButton(onClick = {
-                                if (appState.isPixelsSelected()) appState.updateSourceCodeDialogState(true)
-                                else toaster.showToast("⚠️Empty pattern!")
+                            SquaredUiButton(
+                                onClick = {
+                                    if (appState.isPixelsSelected()) appState.updateSourceCodeDialogState(true)
+                                    else toaster.showToast("⚠️Empty pattern!")
 
-                                val code = sourceCodeGenerator.generateSourceCode(pixelsMap)
-                                appState.setGeneratedSourceCode(code)
-                            }) { Text(text = "source code") }
+                                    val code = sourceCodeGenerator.generateSourceCppCode(pixelsMap)
+                                    appState.setGeneratedSourceCode(code)
+                                },
+                                icon = painterResource(R.drawable.baseline_code_24),
+                                modifier = Modifier.width(135.dp)
+                            ) {
+                                Text(
+                                    text = "source code",
+                                    modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
+                                )
+                            }
 
                             Text(
                                 text = "${appState.getActivePixels()} active pixels",
@@ -210,12 +233,14 @@ fun MainScreen(appState: AppState = viewModel()) {
                                     appState.clearSelectedPixelsMap()
                                     toaster.showToast("Pattern cleared!")
                                 },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                icon = painterResource(R.drawable.baseline_clear_24)
                             ) { Text(text = "clear") }
 
                             SquaredUiButton(
                                 onClick = { appState.invertPixelsMap() },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                icon = painterResource(R.drawable.baseline_invert_colors_24)
                             ) { Text(text = "invert") }
                         }
                 }
@@ -242,12 +267,14 @@ fun MainScreen(appState: AppState = viewModel()) {
                                     appState.clearSelectedPixelsMap()
                                     toaster.showToast("Pattern cleared!")
                                 },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                icon = painterResource(R.drawable.baseline_clear_24)
                             ) { Text(text = "clear") }
 
                             SquaredUiButton(
                                 onClick = { appState.invertPixelsMap() },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                icon = painterResource(R.drawable.baseline_invert_colors_24)
                             ) { Text(text = "invert") }
                         }
                 }

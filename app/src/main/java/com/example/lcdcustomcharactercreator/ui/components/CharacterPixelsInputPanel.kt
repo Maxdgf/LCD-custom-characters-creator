@@ -39,7 +39,7 @@ fun CharacterPixelsUiInputPanel(
                     checked = pixelsMap.get(index),
                     onCheckedChange = { state ->
                         updatePixelStateByIndex(index, state)
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress) // haptic
                     }
                 )
             }

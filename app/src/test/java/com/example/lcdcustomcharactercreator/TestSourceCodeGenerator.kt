@@ -17,7 +17,7 @@ class TestSourceCodeGenerator {
         }
 
         val required = "byte my_character[8] = {\n\t0b01010\n\t0b00000\n\t0b00000\n\t0b00000\n\t0b00000\n\t0b00000\n\t0b00000\n\t0b00000\n};"
-        val sourceCode = sourceCodeGenerator.generateSourceCode(pixelsMap)
+        val sourceCode = sourceCodeGenerator.generateSourceCppCode(pixelsMap)
 
         assertEquals(required, sourceCode.text)
     }

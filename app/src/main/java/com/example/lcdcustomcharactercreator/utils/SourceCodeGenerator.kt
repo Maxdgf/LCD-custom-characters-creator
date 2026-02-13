@@ -13,11 +13,11 @@ class SourceCodeGenerator {
     }
 
     /**
-     * Generates a cpp byte array which contains bytes for custom character.
+     * Generates a cpp byte array code which contains bytes for custom character.
      * @param pixelsMap pixels map.
      * @return source code as annotated string.
      */
-    fun generateSourceCode(pixelsMap: BitSet): AnnotatedString {
+    fun generateSourceCppCode(pixelsMap: BitSet): AnnotatedString {
         val output = AnnotatedString.Builder()
         output.apply {
             withStyle(SpanStyle(color = Color.Blue)) { append("byte") }
@@ -28,7 +28,7 @@ class SourceCodeGenerator {
 
         val byteString = StringBuilder()
         for (i in 0..MAP_SIZE - 1) {
-            if (i == 0 || i % MAP_WIDTH == 0) byteString.append("\n\t0b")
+            if (i == 0 || i % MAP_WIDTH == 0) byteString.append("\n\t0b") // add binary prefix
             val value = if (pixelsMap.get(i)) '1' else '0' // 1 or 0
             byteString.append(value)
         }
