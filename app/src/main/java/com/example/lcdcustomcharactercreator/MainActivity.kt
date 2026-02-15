@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,17 +16,25 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -39,6 +48,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 import com.example.lcdcustomcharactercreator.ui.viewmodels.AppState
 import com.example.lcdcustomcharactercreator.ui.components.ActionUiDialog
@@ -78,6 +90,7 @@ fun MainScreen(appState: AppState = viewModel()) {
 
     val pixelsMap by appState.selectedPixelsMap.collectAsState()
     val sourceCode by appState.generatedSourceCodeState.collectAsState()
+    val binaryOrHexType by appState.binaryOrHexType.collectAsState()
 
     val orientation = configuration.orientation
 
@@ -86,7 +99,7 @@ fun MainScreen(appState: AppState = viewModel()) {
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(R.string.app_name),
+                        text = stringResource(R.string.app_name), // app name
                         modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
                     )
                 },
@@ -98,45 +111,131 @@ fun MainScreen(appState: AppState = viewModel()) {
             )
         }
     ) { innerPadding ->
+        ActionUiDialog(
+            state = appState.editPatternNameDialogState,
+            onDismissRequestFunction = {
+                // check pattern name
+                if (appState.patternName.isNotEmpty()) appState.updateEditPatternNameDialogState(false)
+                else toaster.showToast("⚠️Name is empty!")
+            },
+            titleIcon = painterResource(R.drawable.baseline_edit_24),
+            titleText = "Edit pattern name"
+        ) {
+            // pattern name input field
+            OutlinedTextField(
+                value = appState.patternName,
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = { value -> appState.updatePatternName(value) },
+                placeholder = { Text(text = "enter pattern name...") },
+                singleLine = true,
+                trailingIcon = {
+                    IconButton(onClick = { appState.updatePatternName("") }) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_clear_24),
+                            contentDescription = null
+                        )
+                    }
+                }
+            )
+
+            // dismiss button
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.weight(1f))
+                SquaredUiButton(
+                    onClick = {
+                        // check pattern name
+                        if (appState.patternName.isNotEmpty()) appState.updateEditPatternNameDialogState(false)
+                        else toaster.showToast("⚠️Name is empty!")
+                    }
+                ) { Text(text = "Ok") }
+            }
+        }
+
         // pattern source code dialog
         ActionUiDialog(
             state = appState.sourceCodeDialogState,
             onDismissRequestFunction = { appState.updateSourceCodeDialogState(false) },
             titleIcon = painterResource(R.drawable.baseline_code_24),
-            titleText = "Source code of pattern"
+            titleText = "Source code of pattern ${appState.patternName}"
         ) {
-            Column(
+            val dataType by appState.dataType.collectAsState()
+
+            // update data type and generate source code by data type when binaryOrHexType state changed
+            LaunchedEffect(binaryOrHexType) {
+                val code = withContext(Dispatchers.Default) {
+                    when (dataType) {
+                        "binary" -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, appState.patternName, "binary")
+                        "hex" -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, appState.patternName, "hex")
+                        else -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, appState.patternName, "binary")
+                    }
+                }
+                appState.setGeneratedSourceCode(code) // set source code
+
+                delay(10) // delay 10 ms
+            }
+
+            // code view
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                    .background(
+                        color = Color.Black,
+                        shape = RoundedCornerShape(10.dp)
+                    )
+                    .height(200.dp)
             ) {
-                // code view
-                Box(
+                val verticalScrollState = rememberScrollState()
+                Text(
+                    text = sourceCode,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = Color.Black,
-                            shape = RoundedCornerShape(10.dp)
-                        )
+                        .padding(10.dp)
+                        .verticalScroll(verticalScrollState)
+                )
+            }
+
+            // data type selection row
+            Row(modifier = Modifier.fillMaxWidth()) {
+                // binary type
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Checkbox(
+                        checked = binaryOrHexType.first,
+                        onCheckedChange = { state -> appState.selectDataType(1) } // update data type state when state equals false
+                    )
                     Text(
-                        text = sourceCode,
-                        modifier = Modifier.padding(10.dp)
+                        text = "Binary",
+                        modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
                     )
                 }
 
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    SquaredUiButton(
-                        onClick = { clipBoardManager.setTextToClipboard(sourceCode.text) },
-                        icon = painterResource(R.drawable.baseline_content_copy_24)
-                    ) { Text(text = "copy code") }
+                // hex type
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = binaryOrHexType.second,
+                        onCheckedChange = { state -> appState.selectDataType(2) } // update data type state when state equals false
+                    )
+                    Text(
+                        text = "Hex",
+                        modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
+                    )
+                }
+            }
 
-                    Spacer(modifier = Modifier.weight(1f))
+            Row(modifier = Modifier.fillMaxWidth()) {
+                SquaredUiButton(
+                    onClick = { clipBoardManager.setTextToClipboard(sourceCode.text) },
+                    icon = painterResource(R.drawable.baseline_content_copy_24)
+                ) { Text(text = "copy code") }
 
-                    SquaredUiButton(onClick = { appState.updateSourceCodeDialogState(false) }) {
-                        Text(text = "close")
-                    }
+                Spacer(modifier = Modifier.weight(1f))
+
+                SquaredUiButton(onClick = { appState.updateSourceCodeDialogState(false) }) {
+                    Text(text = "close")
                 }
             }
         }
@@ -193,11 +292,9 @@ fun MainScreen(appState: AppState = viewModel()) {
 
                             SquaredUiButton(
                                 onClick = {
+                                    // check pattern
                                     if (appState.isPixelsSelected()) appState.updateSourceCodeDialogState(true)
                                     else toaster.showToast("⚠️Empty pattern!")
-
-                                    val code = sourceCodeGenerator.generateSourceCppCode(pixelsMap)
-                                    appState.setGeneratedSourceCode(code)
                                 },
                                 icon = painterResource(R.drawable.baseline_code_24),
                                 modifier = Modifier.width(135.dp)
@@ -214,11 +311,20 @@ fun MainScreen(appState: AppState = viewModel()) {
                             )
                         }
 
-                        Box(modifier = Modifier.align(Alignment.CenterVertically)) {
+                        Column(modifier = Modifier.align(Alignment.CenterVertically)) {
                             SelectedUiPixelsViewPanel(
                                 pixelsMap = pixelsMap,
                                 isDisplayBlue = appState.isBlueDisplayState,
                                 size = appState.getPixelsMapSize()
+                            )
+
+                            Text(
+                                text = appState.patternName,
+                                fontWeight = FontWeight.Light,
+                                modifier = Modifier
+                                    .clickable(onClick = { appState.updateEditPatternNameDialogState(true) })
+                                    .width(100.dp)
+                                    .basicMarquee(iterations = Int.MAX_VALUE)
                             )
                         }
                     }
@@ -251,6 +357,7 @@ fun MainScreen(appState: AppState = viewModel()) {
                 contentAlignment = Alignment.Center
             ) {
                 Column {
+                    // pattern input panel
                     CharacterPixelsUiInputPanel(
                         pixelsMap = pixelsMap,
                         updatePixelStateByIndex = appState::updateSelectedPixelsMap,
@@ -258,6 +365,7 @@ fun MainScreen(appState: AppState = viewModel()) {
                     )
 
                     if (orientation == Configuration.ORIENTATION_PORTRAIT)
+                        // modify pattern buttons
                         Row(
                             modifier = Modifier.width(250.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
