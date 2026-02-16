@@ -106,9 +106,6 @@ class AppState : ViewModel() {
     /**Clears all pixels in pixels map.*/
     fun clearSelectedPixelsMap() { _selectedPixelsMap.value = BitSet(MAP_SIZE) }
 
-    /**Returns pixels map size.*/
-    fun getPixelsMapSize() = MAP_SIZE
-
     /**Returns all active pixels in map.*/
     fun getActivePixels() = _selectedPixelsMap.value.cardinality()
 

@@ -82,17 +82,19 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(appState: AppState = viewModel()) {
     val context = LocalContext.current // context
-    val configuration = LocalConfiguration.current
+    val configuration = LocalConfiguration.current // configuration
 
+    // utils
     val sourceCodeGenerator = remember { SourceCodeGenerator() }
     val toaster = remember { Toaster(context) }
     val clipBoardManager = remember { ClipBoardManager(context) }
 
+    // states
     val pixelsMap by appState.selectedPixelsMap.collectAsState()
     val sourceCode by appState.generatedSourceCodeState.collectAsState()
     val binaryOrHexType by appState.binaryOrHexType.collectAsState()
 
-    val orientation = configuration.orientation
+    val orientation = configuration.orientation // current screen orientation
 
     Scaffold(
         topBar = {
@@ -162,19 +164,19 @@ fun MainScreen(appState: AppState = viewModel()) {
 
             // update data type and generate source code by data type when binaryOrHexType state changed
             LaunchedEffect(binaryOrHexType) {
+                // generate pattern's source code by data type mode
                 val code = withContext(Dispatchers.Default) {
                     when (dataType) {
-                        "binary" -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, appState.patternName, "binary")
-                        "hex" -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, appState.patternName, "hex")
-                        else -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, appState.patternName, "binary")
+                        "binary" -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, appState.patternName, "binary") // binary
+                        "hex" -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, appState.patternName, "hex") // hexadecimal
+                        else -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, appState.patternName, "binary") // (default) binary
                     }
                 }
                 appState.setGeneratedSourceCode(code) // set source code
-
                 delay(10) // delay 10 ms
             }
 
-            // code view
+            // scrollable code view
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -227,6 +229,7 @@ fun MainScreen(appState: AppState = viewModel()) {
             }
 
             Row(modifier = Modifier.fillMaxWidth()) {
+                // copy source code button
                 SquaredUiButton(
                     onClick = { clipBoardManager.setTextToClipboard(sourceCode.text) },
                     icon = painterResource(R.drawable.baseline_content_copy_24)
@@ -234,6 +237,7 @@ fun MainScreen(appState: AppState = viewModel()) {
 
                 Spacer(modifier = Modifier.weight(1f))
 
+                // close dialog button
                 SquaredUiButton(onClick = { appState.updateSourceCodeDialogState(false) }) {
                     Text(text = "close")
                 }
@@ -314,8 +318,7 @@ fun MainScreen(appState: AppState = viewModel()) {
                         Column(modifier = Modifier.align(Alignment.CenterVertically)) {
                             SelectedUiPixelsViewPanel(
                                 pixelsMap = pixelsMap,
-                                isDisplayBlue = appState.isBlueDisplayState,
-                                size = appState.getPixelsMapSize()
+                                isDisplayBlue = appState.isBlueDisplayState
                             )
 
                             Text(
@@ -360,8 +363,7 @@ fun MainScreen(appState: AppState = viewModel()) {
                     // pattern input panel
                     CharacterPixelsUiInputPanel(
                         pixelsMap = pixelsMap,
-                        updatePixelStateByIndex = appState::updateSelectedPixelsMap,
-                        size = appState.getPixelsMapSize()
+                        updatePixelStateByIndex = appState::updateSelectedPixelsMap
                     )
 
                     if (orientation == Configuration.ORIENTATION_PORTRAIT)
@@ -370,6 +372,7 @@ fun MainScreen(appState: AppState = viewModel()) {
                             modifier = Modifier.width(250.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
+                            // clear pattern button
                             SquaredUiButton(
                                 onClick = {
                                     appState.clearSelectedPixelsMap()
@@ -379,6 +382,7 @@ fun MainScreen(appState: AppState = viewModel()) {
                                 icon = painterResource(R.drawable.baseline_clear_24)
                             ) { Text(text = "clear") }
 
+                            // invert pixels button
                             SquaredUiButton(
                                 onClick = { appState.invertPixelsMap() },
                                 modifier = Modifier.weight(1f),

@@ -13,32 +13,30 @@ import androidx.compose.ui.unit.dp
 import java.util.BitSet
 
 /**
- * Creates custom character pixels input panel.
- * @param size pixels count.
+ * Creates custom character 5x8 pixels input panel.
  * @param pixelsMap pixels map.
  * @param updatePixelStateByIndex update pixel state by index function.
  */
 @Composable
 fun CharacterPixelsUiInputPanel(
-    size: Int,
     pixelsMap: BitSet,
     updatePixelStateByIndex: (index: Int, state: Boolean) -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(5),
+        columns = GridCells.Fixed(5), // 5 cells
         modifier = Modifier
             .width(250.dp)
             .wrapContentHeight()
     ) {
-        for (i in 0..size - 1) {
+        for (i in 0..39) {
             val index = i
             item {
                 Checkbox(
-                    checked = pixelsMap.get(index),
+                    checked = pixelsMap.get(index), // pixel state
                     onCheckedChange = { state ->
-                        updatePixelStateByIndex(index, state)
+                        updatePixelStateByIndex(index, state) // update current pixel by index
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress) // haptic
                     }
                 )

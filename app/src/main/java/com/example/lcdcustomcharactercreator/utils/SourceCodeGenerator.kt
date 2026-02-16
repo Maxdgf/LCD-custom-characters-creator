@@ -9,8 +9,8 @@ import kotlin.text.toInt
 
 class SourceCodeGenerator {
     companion object {
-        const val MAP_SIZE = 40
-        const val MAP_WIDTH = 5
+        const val MAP_SIZE = 40 // pixels count
+        const val MAP_WIDTH = 5 // pixels in width
     }
 
     /**
@@ -21,7 +21,7 @@ class SourceCodeGenerator {
         val bits = StringBuilder() // output string
         for (i in 0..MAP_SIZE - 1) {
             val value = if (this.get(i)) '1' else '0' // 1 or 0 by bit state
-            bits.append(value)
+            bits.append(value) // append bit state
         }
         return bits.chunked(MAP_WIDTH) // slice bits string on chunks
     }

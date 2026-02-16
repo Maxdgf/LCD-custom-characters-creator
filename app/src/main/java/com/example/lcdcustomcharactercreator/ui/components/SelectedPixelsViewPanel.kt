@@ -18,20 +18,31 @@ import androidx.compose.ui.unit.dp
 import java.util.BitSet
 
 /**
- * Creates lcd custom character preview frame
- * @param size size of preview frame in pixels.
+ * Creates lcd frame pixel.
+ * @param color enabled or disabled pixel color.
+ */
+@Composable
+private fun Pixel(color: Color) {
+    Box(
+        modifier = Modifier
+            .size(20.dp)
+            .background(color)
+    )
+}
+
+/**
+ * Creates lcd custom character preview 5x8 frame.
  * @param pixelsMap pixels map.
  * @param isDisplayBlue bool state of preview skin, blue lcd or green.
  */
 @Composable
 fun SelectedUiPixelsViewPanel(
-    size: Int,
     pixelsMap: BitSet,
     isDisplayBlue: Boolean
 ) {
-    val enabledPixelColor = if (isDisplayBlue) Color(0xFFBDE5FC) else Color(0xFF000500)
-    val disabledPixelColor = if (isDisplayBlue) Color(0xFF1A7CD5) else Color(0xFFA8FF00)
-    val frameBackgroundColor = if (isDisplayBlue) Color(0xFF2398FF) else Color(0xFFD0FF00)
+    val enabledPixelColor = if (isDisplayBlue) Color(0xFFBDE5FC) else Color(0xFF000500) // enabled pixel color (green or blue lcd)
+    val disabledPixelColor = if (isDisplayBlue) Color(0xFF1A7CD5) else Color(0xFFA8FF00) // disabled pixel color (green or blue lcd)
+    val frameBackgroundColor = if (isDisplayBlue) Color(0xFF2398FF) else Color(0xFFD0FF00) // frame background color (green or blue lcd)
 
     Box(
         modifier = Modifier
@@ -44,19 +55,16 @@ fun SelectedUiPixelsViewPanel(
             .padding(5.dp)
     ) {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(5),
+            columns = GridCells.Fixed(5), // 5 cells
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.spacedBy(1.dp),
             verticalArrangement = Arrangement.spacedBy(1.dp)
         ) {
-            for (i in 0..size - 1) {
-                val state = pixelsMap.get(i)
+            // create 40 pixels
+            for (i in 0..39) {
+                val state = pixelsMap.get(i) // get pixel state
                 item {
-                    Box(
-                        modifier = Modifier
-                            .size(20.dp)
-                            .background(if (state) enabledPixelColor else disabledPixelColor)
-                    )
+                    Pixel(color = if (state) enabledPixelColor else disabledPixelColor) // set pixel
                 }
             }
         }
