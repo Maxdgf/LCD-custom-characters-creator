@@ -41,6 +41,8 @@
     </tr>
 </table>
 
+* <p>⚠️pixel input panel is scrollable</p>
+
 ## 🌟Features:
 * dynamic result preview💻
 * source code generation📥
