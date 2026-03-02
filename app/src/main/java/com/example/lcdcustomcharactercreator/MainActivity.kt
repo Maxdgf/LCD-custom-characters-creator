@@ -62,9 +62,12 @@ import com.example.lcdcustomcharactercreator.ui.theme.LCDCustomCharacterCreatorT
 import com.example.lcdcustomcharactercreator.ui.theme.blueLcdColor
 import com.example.lcdcustomcharactercreator.ui.theme.greenLcdColor
 import com.example.lcdcustomcharactercreator.utils.ClipBoardManager
+import com.example.lcdcustomcharactercreator.utils.DatetimePicker
 import com.example.lcdcustomcharactercreator.utils.SourceCodeGenerator
 import com.example.lcdcustomcharactercreator.utils.Toaster
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +91,7 @@ fun MainScreen(appState: AppState = viewModel()) {
     val sourceCodeGenerator = remember { SourceCodeGenerator() }
     val toaster = remember { Toaster(context) }
     val clipBoardManager = remember { ClipBoardManager(context) }
+    val datetimePicker = remember { DatetimePicker() }
 
     // states
     val pixelsMap by appState.selectedPixelsMap.collectAsState()

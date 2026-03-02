@@ -66,6 +66,12 @@ class AppState : ViewModel() {
     }
 
     /**
+     * Sets new pixels map.
+     * @param map bit set to set.
+     */
+    fun setPixelsMap(map: BitSet) { _selectedPixelsMap.value = map }
+
+    /**
      * Updates pixels map. Enables or disables pixel on position by index and state.
      * @param index bit position.
      * @param state state for bit(true - enable or false - disable).
