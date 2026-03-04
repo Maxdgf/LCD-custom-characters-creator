@@ -11,4 +11,8 @@ class PatternRepositoryImpl @Inject constructor(private val patternDao: PatternD
     override suspend fun addPattern(pattern: SavedPatternEntity) = patternDao.addPattern(pattern)
 
     override suspend fun deleteAllPatterns() = patternDao.deleteAllSavedPatterns()
+
+    override suspend fun deletePatternById(id: Int) = patternDao.deletePatternById(id)
+
+    override fun getSavedPatternById(id: Int): Flow<SavedPatternEntity> = patternDao.getSavedPatternById(id)
 }

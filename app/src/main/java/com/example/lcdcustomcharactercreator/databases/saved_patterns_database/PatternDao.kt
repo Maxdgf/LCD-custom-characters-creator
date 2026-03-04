@@ -15,6 +15,12 @@ interface PatternDao {
     @Insert(onConflict = REPLACE)
     suspend fun addPattern(pattern: SavedPatternEntity)
 
+    @Query("SELECT * FROM saved_patterns WHERE id = :id")
+    fun getSavedPatternById(id: Int): Flow<SavedPatternEntity>
+
+    @Query("DELETE FROM saved_patterns WHERE id = :id")
+    suspend fun deletePatternById(id: Int)
+
     @Query("DELETE FROM saved_patterns")
     suspend fun deleteAllSavedPatterns()
 }
