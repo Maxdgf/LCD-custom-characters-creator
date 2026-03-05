@@ -41,7 +41,7 @@ fun SavedPatternUiItem(
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(text = name)
 
             // description

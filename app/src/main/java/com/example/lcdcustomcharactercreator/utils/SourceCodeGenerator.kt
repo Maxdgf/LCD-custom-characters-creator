@@ -51,15 +51,15 @@ class SourceCodeGenerator {
         pixelsMap: BitSet,
         patternName: String,
         dataType: String
-    ): AnnotatedString {
-        val output = AnnotatedString.Builder() // output annotated string
+    ): String {
+        val output = StringBuilder() // output string
 
         // add start part
         output.apply {
-            withStyle(SpanStyle(color = Color.Blue)) { append("byte") }
-            withStyle(SpanStyle(color = Color.White)) { append(" $patternName[") }
-            withStyle(SpanStyle(color = Color.Cyan)) { append('8') }
-            withStyle(SpanStyle(color = Color.White)) { append("] = {") }
+            append("byte")
+            append(" $patternName[")
+            append('8')
+            append("] = {")
         }
 
         val data = pixelsMap.readBitSet() // read pixels map
@@ -72,14 +72,15 @@ class SourceCodeGenerator {
         // add byte array elements
         elements.forEachIndexed { index, element ->
             output.apply {
-                withStyle(SpanStyle(color = Color.Cyan)) {
-                    append("\n\t$element")
-                }
-                append(if (index < data.lastIndex) "," else "") // add comma
+                append("\n\t$element")
+                append(
+                    if (index < data.lastIndex) ","
+                    else ""
+                ) // add comma or not
             }
         }
-        output.withStyle(SpanStyle(color = Color.White)) { append("\n};") } // add end part
+        output.append("\n};") // add end part
 
-        return output.toAnnotatedString()
+        return output.toString()
     }
 }

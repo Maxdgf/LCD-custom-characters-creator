@@ -8,7 +8,7 @@ import com.example.lcdcustomcharactercreator.databases.saved_patterns_database.e
     entities = [
         SavedPatternEntity::class
     ],
-    version = 1
+    version = 2
 )
 abstract class PatternDatabase : RoomDatabase() {
     abstract fun getPatternDao(): PatternDao

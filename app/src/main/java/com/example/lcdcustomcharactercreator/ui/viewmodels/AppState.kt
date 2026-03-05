@@ -28,11 +28,15 @@ class AppState : ViewModel() {
     var isBlueDisplayState by mutableStateOf(true)
     var sourceCodeDialogState by mutableStateOf(false)
     var editPatternNameDialogState by mutableStateOf(false)
+    var dropDownMenuState by mutableStateOf(false)
+    var savePatternDialogState by mutableStateOf(false)
+    var saveableNameOfPattern by mutableStateOf("")
+    var saveableDescriptionOfPattern by mutableStateOf("")
 
     // source code generation states
     var patternName by mutableStateOf("my_character")
 
-    private val _generatedSourceCodeState = MutableStateFlow<AnnotatedString>(AnnotatedString("")) // generated highlighted source code
+    private val _generatedSourceCodeState = MutableStateFlow<String>("") // generated highlighted source code
     val generatedSourceCodeState = _generatedSourceCodeState.asStateFlow()
 
     private val _binaryOrHexType = MutableStateFlow<Pair<Boolean, Boolean>>(Pair(true, false)) // binary mode selected by default
@@ -138,11 +142,35 @@ class AppState : ViewModel() {
      * Sets generated code string to source code state.
      * @param code generated code annotated string.
      */
-    fun setGeneratedSourceCode(code: AnnotatedString) { _generatedSourceCodeState.value = code }
+    fun setGeneratedSourceCode(code: String) { _generatedSourceCodeState.value = code }
 
     /**
      * Updates pattern name state.
      * @param name name of pattern.
      */
     fun updatePatternName(name: String) { patternName = name }
+
+    /**
+     * Updates dropdown menu state.
+     * @param state bool state.
+     */
+    fun updateDropDownMenuState(state: Boolean) { dropDownMenuState = state }
+
+    /**
+     * Updates save pattern dialog state.
+     * @param state bool state.
+     */
+    fun updateSavePatternDialogState(state: Boolean) { savePatternDialogState = state }
+
+    /**
+     * Updates saveable name of pattern.
+     * @param text pattern name.
+     */
+    fun updateSaveableNameOfPatternState(text: String) { saveableNameOfPattern = text }
+
+    /**
+     * Updates saveable description of pattern.
+     * @param text pattern description.
+     */
+    fun updateSaveableDescriptionOfPattern(text: String) { saveableDescriptionOfPattern = text }
 }

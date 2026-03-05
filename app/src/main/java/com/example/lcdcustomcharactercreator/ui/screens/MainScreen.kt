@@ -1,6 +1,7 @@
 package com.example.lcdcustomcharactercreator.ui.screens
 
 import android.content.res.Configuration
+import android.util.Base64
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
@@ -23,7 +24,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -71,6 +75,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.BitSet
 
 /**Creates app main screen.*/
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,7 +122,8 @@ fun MainAppScreen(
                                 description = pattern.description,
                                 creationDatetime = pattern.creationDate,
                                 onClick = {
-                                    // logic...
+                                    val encodedPixelsMap = BitSet.valueOf(Base64.decode(pattern.source, Base64.DEFAULT))
+                                    appState.setPixelsMap(encodedPixelsMap)
                                     coroutineScope.launch { drawerState.close() } // close drawer sheet
                                 },
                                 onDelete = {
@@ -128,11 +134,14 @@ fun MainAppScreen(
                                     } // close drawer sheet
                                 }
                             )
+
+                            if (index < savedPatterns.lastIndex) HorizontalDivider() // set divider
                         }
                     }
 
                     // delete all button
                     SquaredUiButton(
+                        modifier = Modifier.fillMaxWidth(),
                         onClick = {
                             if (savedPatterns.isNotEmpty()) savedPatternViewModel.deleteAllPatterns()
                             else toaster.showToast("nothing to delete!")
@@ -152,6 +161,43 @@ fun MainAppScreen(
                             modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
                         )
                     },
+                    actions = {
+                        Box {
+                            // menu button
+                            IconButton(onClick = { appState.updateDropDownMenuState(true) }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.baseline_more_vert_24),
+                                    contentDescription = null
+                                )
+                            }
+
+                            // dropdown menu
+                            DropdownMenu(
+                                expanded = appState.dropDownMenuState,
+                                onDismissRequest = { appState.updateDropDownMenuState(false) }
+                            ) {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        appState.updateSavePatternDialogState(true)
+                                        appState.updateDropDownMenuState(false)
+                                    },
+                                    text = {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(R.drawable.baseline_save_24),
+                                                contentDescription = null
+                                            )
+
+                                            Text(text = "save")
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         titleContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -160,6 +206,74 @@ fun MainAppScreen(
                 )
             }
         ) { innerPadding ->
+            // save pattern dialog
+            ActionUiDialog(
+                state = appState.savePatternDialogState,
+                onDismissRequestFunction = {
+                    appState.updateSavePatternDialogState(false) // close dialog
+                },
+                titleIcon = painterResource(R.drawable.baseline_save_24),
+                titleText = "Save pattern"
+            ) {
+                // pattern name input field
+                OutlinedTextField(
+                    value = appState.saveableNameOfPattern,
+                    modifier = Modifier.fillMaxWidth(),
+                    onValueChange = { value -> appState.updateSaveableNameOfPatternState(value) },
+                    placeholder = { Text(text = "enter pattern name...") },
+                    singleLine = true,
+                    trailingIcon = {
+                        IconButton(onClick = { appState.updateSaveableNameOfPatternState("") }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_clear_24),
+                                contentDescription = null
+                            )
+                        }
+                    }
+                )
+
+                // pattern name input field
+                OutlinedTextField(
+                    value = appState.saveableDescriptionOfPattern,
+                    modifier = Modifier.fillMaxWidth(),
+                    onValueChange = { value -> appState.updateSaveableDescriptionOfPattern(value) },
+                    placeholder = { Text(text = "enter pattern description... (optional)") },
+                    singleLine = true,
+                    trailingIcon = {
+                        IconButton(onClick = { appState.updateSaveableDescriptionOfPattern("") }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_clear_24),
+                                contentDescription = null
+                            )
+                        }
+                    }
+                )
+
+                // save pattern button
+                SquaredUiButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        val patternSource = Base64.encodeToString(pixelsMap.toByteArray(), Base64.DEFAULT)
+
+                        savedPatternViewModel.addPattern(
+                            appState.saveableNameOfPattern,
+                            if (appState.saveableDescriptionOfPattern.isEmpty()) null
+                            else appState.saveableDescriptionOfPattern, // pattern description (optional)
+                            patternSource,
+                            appState.isBlueDisplayState
+                        )
+
+                        appState.apply {
+                            updateSavePatternDialogState(false) // close dialog
+                            updateSaveableDescriptionOfPattern("")
+                            updateSaveableNameOfPatternState("")
+                        }
+                    },
+                    icon = painterResource(R.drawable.baseline_save_24)
+                ) { Text(text = "save") }
+            }
+
+            // edit pattern name dialog
             ActionUiDialog(
                 state = appState.editPatternNameDialogState,
                 onDismissRequestFunction = {
@@ -278,7 +392,7 @@ fun MainAppScreen(
                 Row(modifier = Modifier.fillMaxWidth()) {
                     // copy source code button
                     SquaredUiButton(
-                        onClick = { clipBoardManager.setTextToClipboard(sourceCode.text) },
+                        onClick = { clipBoardManager.setTextToClipboard(sourceCode) },
                         icon = painterResource(R.drawable.baseline_content_copy_24)
                     ) { Text(text = "copy code") }
 
