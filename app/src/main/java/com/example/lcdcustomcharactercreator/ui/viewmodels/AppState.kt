@@ -27,14 +27,10 @@ class AppState : ViewModel() {
     // ui states
     var isBlueDisplayState by mutableStateOf(true)
     var sourceCodeDialogState by mutableStateOf(false)
-    var editPatternNameDialogState by mutableStateOf(false)
     var dropDownMenuState by mutableStateOf(false)
     var savePatternDialogState by mutableStateOf(false)
     var saveableNameOfPattern by mutableStateOf("")
     var saveableDescriptionOfPattern by mutableStateOf("")
-
-    // source code generation states
-    var patternName by mutableStateOf("my_character")
 
     private val _generatedSourceCodeState = MutableStateFlow<String>("") // generated highlighted source code
     val generatedSourceCodeState = _generatedSourceCodeState.asStateFlow()
@@ -52,21 +48,17 @@ class AppState : ViewModel() {
     private fun isIndexExists(index: Int) = index >= 0 && index < MAP_SIZE
 
     /**
-     * Selects data type and updates data type flags states by order num.
-     * @param orderNum order num.
+     * Selects data type and updates data type flags states by data type name.
+     * @param dataTypeName data type name.
      */
-    fun selectDataType(orderNum: Int) {
-        // 1 - binary 2 - hexadecimal
-        when (orderNum) {
-            1 -> {
-                _binaryOrHexType.value = Pair(true, false)
-                _dataType.value = "binary" // set binary type
-            } // manage binary type
-            2 -> {
-                _binaryOrHexType.value = Pair(false, true)
-                _dataType.value = "hex" // set hexadecimal type
-            } // manage hexadecimal type
+    fun selectDataType(dataTypeName: String) {
+        // binary or hexadecimal
+        when (dataTypeName) {
+            "binary" -> _binaryOrHexType.value = Pair(true, false) // binary enabled
+            "hex" -> _binaryOrHexType.value = Pair(false, true) // hexadecimal enabled
         }
+
+        _dataType.value = dataTypeName // set data type
     }
 
     /**
@@ -133,22 +125,10 @@ class AppState : ViewModel() {
     fun updateSourceCodeDialogState(state: Boolean) { sourceCodeDialogState = state }
 
     /**
-     * Updates edit pattern name dialog state.
-     * @param state bool state.
-     */
-    fun updateEditPatternNameDialogState(state: Boolean) { editPatternNameDialogState = state }
-
-    /**
      * Sets generated code string to source code state.
      * @param code generated code annotated string.
      */
     fun setGeneratedSourceCode(code: String) { _generatedSourceCodeState.value = code }
-
-    /**
-     * Updates pattern name state.
-     * @param name name of pattern.
-     */
-    fun updatePatternName(name: String) { patternName = name }
 
     /**
      * Updates dropdown menu state.

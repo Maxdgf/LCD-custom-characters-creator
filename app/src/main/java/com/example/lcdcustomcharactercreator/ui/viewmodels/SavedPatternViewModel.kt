@@ -2,14 +2,19 @@ package com.example.lcdcustomcharactercreator.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lcdcustomcharactercreator.databases.saved_patterns_database.entities.SavedPatternEntity
-import com.example.lcdcustomcharactercreator.databases.saved_patterns_database.repository.PatternRepository
-import com.example.lcdcustomcharactercreator.utils.DatetimePicker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+import com.example.lcdcustomcharactercreator.databases.saved_patterns_database.entities.SavedPatternEntity
+import com.example.lcdcustomcharactercreator.databases.saved_patterns_database.repository.PatternRepository
+import com.example.lcdcustomcharactercreator.utils.DatetimePicker
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class SavedPatternViewModel @Inject constructor(
@@ -22,11 +27,21 @@ class SavedPatternViewModel @Inject constructor(
         emptyList()
     )
 
+    private val _openedPatternId = MutableStateFlow<Int?>(null)
+    val openedPatternId = _openedPatternId.asStateFlow()
+
+
+    fun setOpenedPatternId(id: Int?) {
+        _openedPatternId.value = id
+    }
+
     fun addPattern(
         name: String,
         description: String?,
         source: String,
-        isLcdBlueState: Boolean
+        isLcdBlueState: Boolean,
+        sourceCode: String,
+        sourceCodeDataType: String
     ) {
         viewModelScope.launch {
             patternRepository.addPattern(
@@ -35,8 +50,26 @@ class SavedPatternViewModel @Inject constructor(
                     description = description,
                     creationDate = datetimePicker.pickDateTimeNow(),
                     source = source,
-                    isLcdBlueState = isLcdBlueState
+                    isLcdBlueState = isLcdBlueState,
+                    sourceCode = sourceCode,
+                    dataType = sourceCodeDataType
                 )
+            )
+        }
+    }
+
+    fun updateExistingPattern(
+        patternSource: String,
+        sourceCode: String,
+        id: Int,
+        isLcdBlue: Boolean
+    ) {
+        viewModelScope.launch {
+            patternRepository.updateExistingPattern(
+                patternSource,
+                sourceCode,
+                id,
+                isLcdBlue
             )
         }
     }

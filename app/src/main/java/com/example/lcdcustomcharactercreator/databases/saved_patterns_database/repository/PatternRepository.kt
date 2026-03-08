@@ -8,5 +8,6 @@ interface PatternRepository {
     suspend fun addPattern(pattern: SavedPatternEntity)
     suspend fun deleteAllPatterns()
     suspend fun deletePatternById(id: Int)
+    suspend fun updateExistingPattern(patternSource: String, sourceCode: String, id: Int, isLcdBlue: Boolean)
     fun getSavedPatternById(id: Int): Flow<SavedPatternEntity>
 }

@@ -21,6 +21,9 @@ interface PatternDao {
     @Query("DELETE FROM saved_patterns WHERE id = :id")
     suspend fun deletePatternById(id: Int)
 
+    @Query("UPDATE saved_patterns SET pattern_source = :patternSource, source_code = :sourceCode, is_lcd_blue = :isLcdBlue WHERE id = :id")
+    suspend fun updateExistingPattern(patternSource: String, sourceCode: String, id: Int, isLcdBlue: Boolean)
+
     @Query("DELETE FROM saved_patterns")
     suspend fun deleteAllSavedPatterns()
 }

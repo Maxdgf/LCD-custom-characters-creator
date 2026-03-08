@@ -11,5 +11,7 @@ data class SavedPatternEntity(
     @ColumnInfo(name = "pattern_description") val description: String? = null,
     @ColumnInfo(name = "pattern_creation_date") val creationDate: String,
     @ColumnInfo(name = "pattern_source") val source: String,
-    @ColumnInfo(name = "is_lcd_blue") val isLcdBlueState: Boolean
+    @ColumnInfo(name = "is_lcd_blue") val isLcdBlueState: Boolean,
+    @ColumnInfo(name = "source_code") val sourceCode: String,
+    @ColumnInfo(name = "source_code_data_type") val dataType: String
 )

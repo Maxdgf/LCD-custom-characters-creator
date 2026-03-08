@@ -1,9 +1,5 @@
 package com.example.lcdcustomcharactercreator.utils
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.withStyle
 import java.util.BitSet
 import kotlin.text.toInt
 
@@ -43,13 +39,11 @@ class SourceCodeGenerator {
     /**
      * Generates a cpp byte array code which contains bytes for custom character.
      * @param pixelsMap pixels map.
-     * @param patternName name of pattern.
      * @param dataType type of byte array elements *(default type = `binary`, all types = `binary`, `hex`)*
      * @return source code as annotated string.
      */
     fun generateSourceCppByteArrayCode(
         pixelsMap: BitSet,
-        patternName: String,
         dataType: String
     ): String {
         val output = StringBuilder() // output string
@@ -57,7 +51,7 @@ class SourceCodeGenerator {
         // add start part
         output.apply {
             append("byte")
-            append(" $patternName[")
+            append(" char[")
             append('8')
             append("] = {")
         }
