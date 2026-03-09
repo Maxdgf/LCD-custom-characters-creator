@@ -5,9 +5,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,9 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -48,22 +46,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-
-import com.example.lcdcustomcharactercreator.ui.viewmodels.AppState
 import com.example.lcdcustomcharactercreator.ui.components.ActionUiDialog
 import com.example.lcdcustomcharactercreator.ui.components.AdaptiveUiBox
 import com.example.lcdcustomcharactercreator.ui.components.CharacterPixelsUiInputPanel
 import com.example.lcdcustomcharactercreator.ui.components.SelectedUiPixelsViewPanel
 import com.example.lcdcustomcharactercreator.ui.components.SquaredUiButton
+
 import com.example.lcdcustomcharactercreator.ui.theme.LCDCustomCharacterCreatorTheme
 import com.example.lcdcustomcharactercreator.ui.theme.blueLcdColor
 import com.example.lcdcustomcharactercreator.ui.theme.greenLcdColor
+import com.example.lcdcustomcharactercreator.ui.viewmodels.AppState
 import com.example.lcdcustomcharactercreator.utils.ClipBoardManager
 import com.example.lcdcustomcharactercreator.utils.SourceCodeGenerator
 import com.example.lcdcustomcharactercreator.utils.Toaster
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,6 +72,21 @@ class MainActivity : ComponentActivity() {
                 MainScreen()
             }
         }
+    }
+}
+
+/**
+ * Creates check icon which visible by state
+ * @param visibleState visible state.
+ */
+@Composable
+private fun CheckIcon(visibleState: Boolean) {
+    AnimatedVisibility(visible = visibleState) {
+        Icon(
+            painter = painterResource(R.drawable.baseline_check_24),
+            tint = Color.Green, // green tint
+            contentDescription = null
+        )
     }
 }
 
@@ -113,52 +126,12 @@ fun MainScreen(appState: AppState = viewModel()) {
             )
         }
     ) { innerPadding ->
-        ActionUiDialog(
-            state = appState.editPatternNameDialogState,
-            onDismissRequestFunction = {
-                // check pattern name
-                if (appState.patternName.isNotEmpty()) appState.updateEditPatternNameDialogState(false)
-                else toaster.showToast("⚠️Name is empty!")
-            },
-            titleIcon = painterResource(R.drawable.baseline_edit_24),
-            titleText = "Edit pattern name"
-        ) {
-            // pattern name input field
-            OutlinedTextField(
-                value = appState.patternName,
-                modifier = Modifier.fillMaxWidth(),
-                onValueChange = { value -> appState.updatePatternName(value) },
-                placeholder = { Text(text = "enter pattern name...") },
-                singleLine = true,
-                trailingIcon = {
-                    IconButton(onClick = { appState.updatePatternName("") }) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_clear_24),
-                            contentDescription = null
-                        )
-                    }
-                }
-            )
-
-            // dismiss button
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Spacer(modifier = Modifier.weight(1f))
-                SquaredUiButton(
-                    onClick = {
-                        // check pattern name
-                        if (appState.patternName.isNotEmpty()) appState.updateEditPatternNameDialogState(false)
-                        else toaster.showToast("⚠️Name is empty!")
-                    }
-                ) { Text(text = "Ok") }
-            }
-        }
-
         // pattern source code dialog
         ActionUiDialog(
             state = appState.sourceCodeDialogState,
             onDismissRequestFunction = { appState.updateSourceCodeDialogState(false) },
             titleIcon = painterResource(R.drawable.baseline_code_24),
-            titleText = "Source code of pattern ${appState.patternName}"
+            titleText = "Source code of pattern"
         ) {
             val dataType by appState.dataType.collectAsState()
 
@@ -167,12 +140,13 @@ fun MainScreen(appState: AppState = viewModel()) {
                 // generate pattern's source code by data type mode
                 val code = withContext(Dispatchers.Default) {
                     when (dataType) {
-                        "binary" -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, appState.patternName, "binary") // binary
-                        "hex" -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, appState.patternName, "hex") // hexadecimal
-                        else -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, appState.patternName, "binary") // (default) binary
+                        "binary" -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, "binary") // binary
+                        "hex" -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, "hex") // hexadecimal
+                        else -> sourceCodeGenerator.generateSourceCppByteArrayCode(pixelsMap, "binary") // (default) binary
                     }
                 }
                 appState.setGeneratedSourceCode(code) // set source code
+
                 delay(10) // delay 10 ms
             }
 
@@ -184,9 +158,10 @@ fun MainScreen(appState: AppState = viewModel()) {
                         color = Color.Black,
                         shape = RoundedCornerShape(10.dp)
                     )
-                    .height(200.dp)
+                    .height(180.dp)
             ) {
-                val verticalScrollState = rememberScrollState()
+                val verticalScrollState = rememberScrollState() // vertical scroll state for source code view
+
                 Text(
                     text = sourceCode,
                     modifier = Modifier
@@ -204,7 +179,7 @@ fun MainScreen(appState: AppState = viewModel()) {
                 ) {
                     Checkbox(
                         checked = binaryOrHexType.first,
-                        onCheckedChange = { state -> appState.selectDataType(1) } // update data type state when state equals false
+                        onCheckedChange = { state -> appState.selectDataType("binary") } // update data type state when state equals false
                     )
                     Text(
                         text = "Binary",
@@ -219,7 +194,7 @@ fun MainScreen(appState: AppState = viewModel()) {
                 ) {
                     Checkbox(
                         checked = binaryOrHexType.second,
-                        onCheckedChange = { state -> appState.selectDataType(2) } // update data type state when state equals false
+                        onCheckedChange = { state -> appState.selectDataType("hex") } // update data type state when state equals false
                     )
                     Text(
                         text = "Hex",
@@ -257,40 +232,63 @@ fun MainScreen(appState: AppState = viewModel()) {
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            SquaredUiButton(
-                                onClick = { appState.updateIsBlueDisplayState(true) },
-                                modifier = Modifier.width(135.dp)
+                        Column(
+                            modifier = Modifier.width(135.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            // blue lcd skin button
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(5.dp)
                             ) {
-                                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(10.dp)
-                                            .background(color = blueLcdColor)
-                                            .align(Alignment.CenterVertically)
-                                    )
-                                    Text(
-                                        text = "blue LCD",
-                                        modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
-                                    )
+                                CheckIcon(visibleState = appState.lcdPreviewSkinState.first)
+                                SquaredUiButton(
+                                    onClick = {
+                                        appState.setLcdPreviewSkin("blue")
+                                        toaster.showToast("blue lcd🔵")
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(10.dp)
+                                                .background(color = blueLcdColor)
+                                                .align(Alignment.CenterVertically)
+                                        )
+                                        Text(
+                                            text = "blue LCD",
+                                            modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
+                                        )
+                                    }
                                 }
                             }
 
-                            SquaredUiButton(
-                                onClick = { appState.updateIsBlueDisplayState(false) },
-                                modifier = Modifier.width(135.dp)
+                            // green lcd skin button
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(5.dp)
                             ) {
-                                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(10.dp)
-                                            .background(color = greenLcdColor)
-                                            .align(Alignment.CenterVertically)
-                                    )
-                                    Text(
-                                        text = "green LCD",
-                                        modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
-                                    )
+                                CheckIcon(visibleState = appState.lcdPreviewSkinState.second)
+                                SquaredUiButton(
+                                    onClick = {
+                                        appState.setLcdPreviewSkin("green")
+                                        toaster.showToast("green lcd🟢")
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(10.dp)
+                                                .background(color = greenLcdColor)
+                                                .align(Alignment.CenterVertically)
+                                        )
+                                        Text(
+                                            text = "green LCD",
+                                            modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
+                                        )
+                                    }
                                 }
                             }
 
@@ -301,7 +299,7 @@ fun MainScreen(appState: AppState = viewModel()) {
                                     else toaster.showToast("⚠️Empty pattern!")
                                 },
                                 icon = painterResource(R.drawable.baseline_code_24),
-                                modifier = Modifier.width(135.dp)
+                                modifier = Modifier.fillMaxWidth()
                             ) {
                                 Text(
                                     text = "source code",
@@ -318,16 +316,7 @@ fun MainScreen(appState: AppState = viewModel()) {
                         Column(modifier = Modifier.align(Alignment.CenterVertically)) {
                             SelectedUiPixelsViewPanel(
                                 pixelsMap = pixelsMap,
-                                isDisplayBlue = appState.isBlueDisplayState
-                            )
-
-                            Text(
-                                text = appState.patternName,
-                                fontWeight = FontWeight.Light,
-                                modifier = Modifier
-                                    .clickable(onClick = { appState.updateEditPatternNameDialogState(true) })
-                                    .width(100.dp)
-                                    .basicMarquee(iterations = Int.MAX_VALUE)
+                                lcdPreviewSkinState = appState.lcdPreviewSkinState
                             )
                         }
                     }
@@ -367,7 +356,7 @@ fun MainScreen(appState: AppState = viewModel()) {
                     )
 
                     if (orientation == Configuration.ORIENTATION_PORTRAIT)
-                        // modify pattern buttons
+                    // modify pattern buttons
                         Row(
                             modifier = Modifier.width(250.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)

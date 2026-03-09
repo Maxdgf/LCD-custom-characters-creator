@@ -43,13 +43,11 @@ class SourceCodeGenerator {
     /**
      * Generates a cpp byte array code which contains bytes for custom character.
      * @param pixelsMap pixels map.
-     * @param patternName name of pattern.
      * @param dataType type of byte array elements *(default type = `binary`, all types = `binary`, `hex`)*
      * @return source code as annotated string.
      */
     fun generateSourceCppByteArrayCode(
         pixelsMap: BitSet,
-        patternName: String,
         dataType: String
     ): AnnotatedString {
         val output = AnnotatedString.Builder() // output annotated string
@@ -57,17 +55,18 @@ class SourceCodeGenerator {
         // add start part
         output.apply {
             withStyle(SpanStyle(color = Color.Blue)) { append("byte") }
-            withStyle(SpanStyle(color = Color.White)) { append(" $patternName[") }
+            withStyle(SpanStyle(color = Color.White)) { append(" char[") }
             withStyle(SpanStyle(color = Color.Cyan)) { append('8') }
             withStyle(SpanStyle(color = Color.White)) { append("] = {") }
         }
 
         val data = pixelsMap.readBitSet() // read pixels map
-        val elements = when (dataType) {
-            "binary" -> data.map { it.formatToBinary() }
-            "hex" -> data.map { it.formatToHex() }
-            else -> data.map { it.formatToBinary() } // default
-        }
+        val elements =
+            when (dataType) {
+                "binary" -> data.map { it.formatToBinary() }
+                "hex" -> data.map { it.formatToHex() }
+                else -> data.map { it.formatToBinary() } // default
+            }
 
         // add byte array elements
         elements.forEachIndexed { index, element ->
@@ -75,7 +74,10 @@ class SourceCodeGenerator {
                 withStyle(SpanStyle(color = Color.Cyan)) {
                     append("\n\t$element")
                 }
-                append(if (index < data.lastIndex) "," else "") // add comma
+                append(
+                    if (index < data.lastIndex) "," // comma
+                    else "" // nothing
+                ) // add comma
             }
         }
         output.withStyle(SpanStyle(color = Color.White)) { append("\n};") } // add end part
