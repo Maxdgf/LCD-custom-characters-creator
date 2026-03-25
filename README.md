@@ -1,4 +1,4 @@
-# LCD custom characters creator
+<h1 align="center">LCD custom characters creator</h1>
 📱A simple mobile tool on *Jetpack Compose* for LCD display custom characters creating, for Arduino.
 
 ## 📁Suitable for arduino libs:
