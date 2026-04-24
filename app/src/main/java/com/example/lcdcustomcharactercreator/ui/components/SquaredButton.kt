@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Creates rounded square button with icon.
+ *
  * @param onClick on-click function.
  * @param modifier modifier.
  * @param icon button icon painter.

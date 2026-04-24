@@ -20,6 +20,9 @@ fun AdaptiveUiBox(
     val configuration = LocalConfiguration.current // current configuration
     val orientation = configuration.orientation // screen orientation
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) Column(modifier = modifier) { content() }
-    else Row(modifier = modifier) { content() }
+    // show column or row by current orientation
+    if (orientation == Configuration.ORIENTATION_PORTRAIT)
+        Column(modifier = modifier) { content() }
+    else
+        Row(modifier = modifier) { content() }
 }

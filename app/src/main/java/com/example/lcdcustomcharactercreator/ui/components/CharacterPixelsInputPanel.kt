@@ -14,6 +14,7 @@ import java.util.BitSet
 
 /**
  * Creates custom character 5x8 pixels input panel.
+ *
  * @param pixelsMap pixels map.
  * @param updatePixelStateByIndex update pixel state by index function.
  */
@@ -31,7 +32,8 @@ fun CharacterPixelsUiInputPanel(
             .wrapContentHeight()
     ) {
         for (i in 0..39) {
-            val index = i
+            val index = i // current index
+
             item {
                 Checkbox(
                     checked = pixelsMap.get(index), // pixel state

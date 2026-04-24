@@ -1,9 +1,10 @@
 package com.example.lcdcustomcharactercreator
 
-import com.example.lcdcustomcharactercreator.utils.SourceCodeGenerator
 import org.junit.Test
 import org.junit.Assert.*
 import java.util.BitSet
+
+import com.example.lcdcustomcharactercreator.utils.SourceCodeGenerator
 
 /**Source code generator Unit test.*/
 class TestSourceCodeGenerator {
@@ -11,6 +12,7 @@ class TestSourceCodeGenerator {
 
     @Test
     fun sourceCppByteArrayCodeBinaryModeGenerationIsCorrect() {
+        // create test bitset
         val pixelsMap = BitSet(40).apply {
             set(1)
             set(3)
@@ -25,6 +27,7 @@ class TestSourceCodeGenerator {
 
     @Test
     fun sourceCppByteArrayCodeHexModeGenerationIsCorrect() {
+        // create test bitset
         val pixelsMap = BitSet(40).apply {
             set(1)
             set(3)

@@ -356,7 +356,7 @@ fun MainScreen(appState: AppState = viewModel()) {
                     )
 
                     if (orientation == Configuration.ORIENTATION_PORTRAIT)
-                    // modify pattern buttons
+                        // modify pattern buttons
                         Row(
                             modifier = Modifier.width(250.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)

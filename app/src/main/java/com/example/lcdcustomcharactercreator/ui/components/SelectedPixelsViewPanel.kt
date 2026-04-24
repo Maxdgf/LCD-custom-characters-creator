@@ -44,6 +44,7 @@ private fun Pixel(color: Color) {
 
 /**
  * Creates lcd custom character preview 5x8 frame.
+ *
  * @param pixelsMap pixels map.
  * @param lcdPreviewSkinState bool state of preview skin, blue lcd or green.
  */

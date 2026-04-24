@@ -38,6 +38,7 @@ class AppState : ViewModel() {
 
     /**
      * Checks, is index in range.
+     *
      * @param index current index.
      * @return bool state.
      */
@@ -59,14 +60,18 @@ class AppState : ViewModel() {
 
     /**
      * Updates pixels map. Enables or disables pixel on position by index and state.
+     *
      * @param index bit position.
      * @param state state for bit(true - enable or false - disable).
      */
     fun updateSelectedPixelsMap(index: Int, state: Boolean) {
         if (isIndexExists(index)) {
             val editedMap = _selectedPixelsMap.value.clone() as BitSet // new empty bitset
+
+            // manage pixel state
             if (state) editedMap.set(index) // set bit
             else editedMap.clear(index) // clear bit
+
             _selectedPixelsMap.value = editedMap // set new bitset to current
         }
     }

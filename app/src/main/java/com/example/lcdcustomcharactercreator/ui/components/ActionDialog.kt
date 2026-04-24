@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Creates and setups compose alert dialog with custom content.
+ *
  * @param state dialog state.
  * @param onDismissRequestFunction on dismiss request function.
  * @param dialogContent composable dialog content.

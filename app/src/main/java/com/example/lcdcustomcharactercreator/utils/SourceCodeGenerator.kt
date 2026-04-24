@@ -19,10 +19,12 @@ class SourceCodeGenerator {
      */
     private fun BitSet.readBitSet(): List<String> {
         val bits = StringBuilder() // output string
+
         for (i in 0..MAP_SIZE - 1) {
             val value = if (this.get(i)) '1' else '0' // 1 or 0 by bit state
             bits.append(value) // append bit state
         }
+
         return bits.chunked(MAP_WIDTH) // slice bits string on chunks
     }
 
@@ -42,6 +44,7 @@ class SourceCodeGenerator {
 
     /**
      * Generates a cpp byte array code which contains bytes for custom character.
+     *
      * @param pixelsMap pixels map.
      * @param dataType type of byte array elements *(default type = `binary`, all types = `binary`, `hex`)*
      * @return source code as annotated string.
@@ -80,6 +83,7 @@ class SourceCodeGenerator {
                 ) // add comma
             }
         }
+
         output.withStyle(SpanStyle(color = Color.White)) { append("\n};") } // add end part
 
         return output.toAnnotatedString()
